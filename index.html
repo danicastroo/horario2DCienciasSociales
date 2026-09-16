@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Horario - Bachiller 2D Ciencias Sociales</title>
-<link rel="icon" href="https://www.google.com/s2/favicons?domain=iesfranciscodelosrios.es&sz=256" type="image/png"/>
+  <link rel="icon" href="https://www.google.com/s2/favicons?domain=iesfranciscodelosrios.es&sz=256" type="image/png"/>
   <link rel="manifest" href="manifest.json">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -13,7 +13,7 @@
     body {
       font-family: "Poppins", Arial, sans-serif;
       margin: 0;
-      padding: 20px;
+      padding: 15px;
       background-color: #2c3e50;
       color: white;
       transition: background-color 0.3s;
@@ -28,13 +28,14 @@
       justify-content: center;
       gap: 1rem;
       flex-wrap: wrap;
+      font-size: 1.5rem;
       transition: color 0.3s;
     }
     
     h1 img {
       max-width: 100%;
       height: auto;
-      max-height: 50px;
+      max-height: 45px;
       object-fit: contain;
       transition: filter 0.3s;
     }
@@ -42,40 +43,42 @@
     /* Etiqueta de estado en vivo */
     .status-wrapper {
       text-align: center;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
     
     .live-status {
       display: inline-block;
       background: rgba(26, 188, 156, 0.15);
       color: #1abc9c;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
-      padding: 8px 16px;
+      padding: 6px 14px;
       border-radius: 20px;
       border: 1px solid rgba(26, 188, 156, 0.3);
       transition: all 0.3s ease;
     }
 
     .table-container {
+      width: 100%;
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
     }
 
     table.schedule-table {
       width: 100%;
       border-collapse: collapse;
-      margin-bottom: 20px;
       background-color: #34495e;
-      border-radius: 10px;
-      overflow: hidden;
-      min-width: 700px;
+      min-width: 600px; /* Se ajusta mejor en pantallas de móvil */
       transition: background-color 0.3s;
     }
     .schedule-table th, .schedule-table td {
-      padding: 12px;
+      padding: 10px 8px;
       text-align: center;
       color: white;
+      font-size: 13px;
       transition: all 0.3s ease;
     }
     .schedule-table th {
@@ -83,6 +86,7 @@
       position: sticky;
       top: 0;
       z-index: 2;
+      font-size: 13px;
     }
     .schedule-table td {
       background-color: #34495e;
@@ -91,6 +95,7 @@
     .schedule-table td:first-child {
       background-color: #16a085;
       font-weight: bold;
+      font-size: 12px;
     }
     .schedule-table tr:nth-child(even) td:not(:first-child) {
       background-color: #3a4b60;
@@ -102,6 +107,7 @@
     .recreo {
       background-color: #6277be !important;
       font-weight: bold;
+      letter-spacing: 1px;
     }
     
     .highlight {
@@ -126,6 +132,9 @@
       border-radius: 4px;
     }
 
+    /* ========================================= */
+    /* MODO COLOR (Personalización Guardada)     */
+    /* ========================================= */
     body.color-mode .schedule-table td[data-subject] { font-weight: 600; }
     
     body.color-mode .schedule-table td[data-subject="Filosofía"] { background-color: #b2ebf2; color: #006064; }
@@ -163,7 +172,7 @@
       text-align: center;
       margin-top: 20px;
       padding-bottom: 10px;
-      font-size: 12px;
+      font-size: 11px;
       color: white;
       opacity: 0.5; 
       letter-spacing: 0.5px;
@@ -173,7 +182,7 @@
     .action-buttons {
       display: flex;
       justify-content: center;
-      gap: 12px;
+      gap: 10px;
       margin-top: 20px;
       flex-wrap: wrap;
     }
@@ -182,7 +191,7 @@
       background-color: transparent;
       color: #aac9d5;
       border: 1px solid #405a78;
-      padding: 6px 14px;
+      padding: 8px 12px;
       font-size: 11px;
       font-family: "Poppins", Arial, sans-serif;
       border-radius: 6px;
@@ -192,7 +201,7 @@
       align-items: center;
       justify-content: center;
       gap: 6px;
-      opacity: 0.7;
+      opacity: 0.8;
     }
 
     .btn:hover {
@@ -216,12 +225,19 @@
     }
 
     /* Clase especial para la descarga del Horario en PDF */
-    .pdf-mode { background-color: #ffffff; padding: 20px; }
+    .pdf-mode { 
+      background-color: #ffffff; 
+      padding: 30px; 
+      width: 1123px; 
+      box-sizing: border-box;
+      margin: 0 auto;
+    }
     .pdf-mode h1 { color: #2c3e50; }
     .pdf-mode h1 img { filter: brightness(0); }
     .pdf-mode .copyright-footer { color: #2c3e50; opacity: 1; }
     .pdf-mode .status-wrapper { display: none; }
 
+    /* Estilos del Contenedor Oculto para el Cuadrante */
     .quadrant-hidden-wrapper {
       position: absolute;
       top: -9999px;
@@ -242,8 +258,22 @@
     }
 
     @media (max-width: 768px) {
-      .schedule-table th, .schedule-table td { padding: 10px; font-size: 14px; }
-      h1 { flex-direction: column; font-size: 1.5rem; gap: 10px; }
+      body { padding: 10px; }
+      .schedule-table th, .schedule-table td { padding: 8px 5px; font-size: 12px; }
+      h1 { font-size: 1.2rem; flex-direction: column; gap: 8px; }
+      h1 img { max-height: 40px; }
+      .btn { padding: 8px 10px; font-size: 10px; }
+    }
+
+    @media print {
+      body { background-color: #ffffff; }
+      .action-buttons, .status-wrapper, .quadrant-hidden-wrapper { display: none !important; }
+      h1 { color: #2c3e50; }
+      h1 img { filter: brightness(0); }
+      .schedule-table th { background-color: #1abc9c !important; color: white !important; }
+      .schedule-table td { color: black !important; border: 1px solid #ddd; }
+      .copyright-footer { color: #2c3e50; opacity: 1; }
+      * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     }
   </style>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet"/>
@@ -381,8 +411,10 @@
     </button>
   </div>
 
+  <!-- Contenedor Oculto para Generar el Cuadrante Mensual Moderno -->
   <div class="quadrant-hidden-wrapper">
     <div id="quadrantToPdf" class="aesthetic-quadrant">
+      <!-- Cabecera del Cuadrante -->
       <div style="display: flex; justify-content: space-between; align-items: flex-end; padding: 40px 40px 20px 40px;">
         <div>
           <h1 id="quadrantMonthName" style="font-size: 52px; margin: 0; text-transform: capitalize; color: #1abc9c; font-weight: 600; line-height: 1; letter-spacing: -1px;">Mes</h1>
@@ -391,7 +423,9 @@
         <img src="https://www.iesfranciscodelosrios.es/wp-content/uploads/2023/01/logo-menu-ies-rios-2-480x51.webp" alt="Logo" style="height: 55px; filter: brightness(0); opacity: 0.8;"/>
       </div>
       
+      <!-- Tabla del Calendario -->
       <table id="quadrantTable" style="width: 100%; flex-grow: 1; border-collapse: collapse; table-layout: fixed;">
+        <!-- Se rellena por JavaScript -->
       </table>
     </div>
   </div>
@@ -443,6 +477,7 @@
       }
     });
 
+    // Estado en Vivo
     const timeTable = [
       { start: "08:30", end: "09:30", rowIndex: 1 },
       { start: "09:30", end: "10:30", rowIndex: 2 },
@@ -546,6 +581,12 @@
       const daysInMonth = new Date(currentYear, currentMonthIndex + 1, 0).getDate();
       let currentDay = 1;
 
+      const quadrantWrapper = document.querySelector('.quadrant-hidden-wrapper');
+      quadrantWrapper.style.top = '0';
+      quadrantWrapper.style.left = '0';
+      quadrantWrapper.style.zIndex = '-1000';
+      quadrantWrapper.style.opacity = '1';
+
       for (let i = 0; i < 6; i++) {
         let row = document.createElement('tr');
         for (let j = 0; j < 7; j++) {
@@ -573,7 +614,6 @@
           row.appendChild(cell);
         }
         quadrantTable.appendChild(row);
-        if (currentDay > daysInMonth) break;
       }
 
       const elementToCapture = document.getElementById('quadrantToPdf');
@@ -583,7 +623,11 @@
         image: { type: 'jpeg', quality: 1 },
         html2canvas: { scale: 2, backgroundColor: '#ffffff' },
         jsPDF: { unit: 'px', format: [1123, 794], orientation: 'landscape' }
-      }).from(elementToCapture).save();
+      }).from(elementToCapture).save().then(() => {
+        quadrantWrapper.style.top = '-9999px';
+        quadrantWrapper.style.left = '-9999px';
+        quadrantWrapper.style.opacity = '0';
+      });
     });
 
     // PWA: Instalar
