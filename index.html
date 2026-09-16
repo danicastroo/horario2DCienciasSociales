@@ -1,1 +1,611 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Horario - Bachiller 2D Ciencias Sociales</title>
+  <link rel="icon" href="https://scontent-mad1-1.xx.fbcdn.net/v/t39.30808-6/302505951_516286500501707_3450037676252027922_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=BQU_Qg4Ulo8Q7kNvgHHJTgV&_nc_zt=23&_nc_ht=scontent-mad1-1.xx&_nc_gid=AK-n30hUygt9aRnu2MtQGFi&oh=00_AYDtWCJDpTBWYM84oPcu6SW07FM8OfbkVRBLQCHakLn9ow&oe=679FC07B" type="image/webp"/>
+  <link rel="manifest" href="manifest.json">
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
+  <style>
+    body {
+      font-family: "Poppins", Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #2c3e50;
+      color: white;
+      transition: background-color 0.3s;
+    }
+    
+    h1 {
+      text-align: center;
+      color: white;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      transition: color 0.3s;
+    }
+    
+    h1 img {
+      max-width: 100%;
+      height: auto;
+      max-height: 50px;
+      object-fit: contain;
+      transition: filter 0.3s;
+    }
+
+    /* Etiqueta de estado en vivo */
+    .status-wrapper {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+    
+    .live-status {
+      display: inline-block;
+      background: rgba(26, 188, 156, 0.15);
+      color: #1abc9c;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(26, 188, 156, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table.schedule-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      background-color: #34495e;
+      border-radius: 10px;
+      overflow: hidden;
+      min-width: 700px;
+      transition: background-color 0.3s;
+    }
+    .schedule-table th, .schedule-table td {
+      padding: 12px;
+      text-align: center;
+      color: white;
+      transition: all 0.3s ease;
+    }
+    .schedule-table th {
+      background-color: #1abc9c;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+    .schedule-table td {
+      background-color: #34495e;
+      border-bottom: 1px solid #2c3e50;
+    }
+    .schedule-table td:first-child {
+      background-color: #16a085;
+      font-weight: bold;
+    }
+    .schedule-table tr:nth-child(even) td:not(:first-child) {
+      background-color: #3a4b60;
+    }
+    .schedule-table tr:hover td:not(:first-child) {
+      background-color: #405a78;
+    }
+    
+    .recreo {
+      background-color: #6277be !important;
+      font-weight: bold;
+    }
+    
+    .highlight {
+      background-color: #aac9d5 !important;
+      color: #000;
+      font-weight: bold;
+    }
+
+    /* Efecto para resaltar la clase actual */
+    @keyframes pulse-border {
+      0% { box-shadow: 0 0 0 0 rgba(26, 188, 156, 0.5); }
+      70% { box-shadow: 0 0 0 8px rgba(26, 188, 156, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(26, 188, 156, 0); }
+    }
+    .current-class {
+      background-color: #1abc9c !important;
+      color: white !important;
+      font-weight: bold;
+      animation: pulse-border 2s infinite;
+      position: relative;
+      z-index: 1;
+      border-radius: 4px;
+    }
+
+    body.color-mode .schedule-table td[data-subject] { font-weight: 600; }
+    
+    body.color-mode .schedule-table td[data-subject="Filosofía"] { background-color: #b2ebf2; color: #006064; }
+    body.color-mode .schedule-table td[data-subject="Filosofía"].highlight { background-color: #80deea !important; }
+    
+    body.color-mode .schedule-table td[data-subject="Historia de España"] { background-color: #ffe0b2; color: #e65100; }
+    body.color-mode .schedule-table td[data-subject="Historia de España"].highlight { background-color: #ffcc80 !important; }
+    
+    body.color-mode .schedule-table td[data-subject="Lengua"] { background-color: #fff9c4; color: #f57f17; }
+    body.color-mode .schedule-table td[data-subject="Lengua"].highlight { background-color: #fff59d !important; }
+    
+    body.color-mode .schedule-table td[data-subject="Matemáticas"] { background-color: #ffcdd2; color: #b71c1c; }
+    body.color-mode .schedule-table td[data-subject="Matemáticas"].highlight { background-color: #ef9a9a !important; }
+    
+    body.color-mode .schedule-table td[data-subject="Historia del Arte"] { background-color: #e1bee7; color: #4a148c; }
+    body.color-mode .schedule-table td[data-subject="Historia del Arte"].highlight { background-color: #ce93d8 !important; }
+    
+    body.color-mode .schedule-table td[data-subject="Inglés"] { background-color: #bbdefb; color: #0d47a1; }
+    body.color-mode .schedule-table td[data-subject="Inglés"].highlight { background-color: #90caf9 !important; }
+    
+    body.color-mode .schedule-table td[data-subject="Finanzas"] { background-color: #dcedc8; color: #33691e; }
+    body.color-mode .schedule-table td[data-subject="Finanzas"].highlight { background-color: #c5e1a5 !important; }
+    
+    body.color-mode .schedule-table td[data-subject="E.F."] { background-color: #bcaaa4; color: #3e2723; }
+    body.color-mode .schedule-table td[data-subject="E.F."].highlight { background-color: #a1887f !important; }
+    
+    body.color-mode .schedule-table td[data-subject="Economía"] { background-color: #f8bbd0; color: #880e4f; }
+    body.color-mode .schedule-table td[data-subject="Economía"].highlight { background-color: #f48fb1 !important; }
+    
+    body.color-mode .schedule-table td[data-subject="Religión"] { background-color: #cfd8dc; color: #263238; }
+    body.color-mode .schedule-table td[data-subject="Religión"].highlight { background-color: #b0bec5 !important; }
+    /* ========================================= */
+
+    .copyright-footer {
+      text-align: center;
+      margin-top: 20px;
+      padding-bottom: 10px;
+      font-size: 12px;
+      color: white;
+      opacity: 0.5; 
+      letter-spacing: 0.5px;
+      transition: color 0.3s, opacity 0.3s;
+    }
+
+    .action-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      background-color: transparent;
+      color: #aac9d5;
+      border: 1px solid #405a78;
+      padding: 6px 14px;
+      font-size: 11px;
+      font-family: "Poppins", Arial, sans-serif;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      opacity: 0.7;
+    }
+
+    .btn:hover {
+      background-color: #34495e;
+      color: white;
+      border-color: #1abc9c;
+      opacity: 1;
+    }
+
+    .btn-color-palette svg { stroke: #f39c12; }
+    .btn-calendar svg { stroke: #e74c3c; }
+
+    .btn svg {
+      width: 14px;
+      height: 14px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* Clase especial para la descarga del Horario en PDF */
+    .pdf-mode { background-color: #ffffff; padding: 20px; }
+    .pdf-mode h1 { color: #2c3e50; }
+    .pdf-mode h1 img { filter: brightness(0); }
+    .pdf-mode .copyright-footer { color: #2c3e50; opacity: 1; }
+    .pdf-mode .status-wrapper { display: none; }
+
+    .quadrant-hidden-wrapper {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    .aesthetic-quadrant {
+      width: 1123px;
+      height: 794px;
+      background: #ffffff;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+      color: #2c3e50;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (max-width: 768px) {
+      .schedule-table th, .schedule-table td { padding: 10px; font-size: 14px; }
+      h1 { flex-direction: column; font-size: 1.5rem; gap: 10px; }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <!-- Contenedor Principal (Horario) -->
+  <div id="contentToPdf">
+    <h1>
+      <img src="https://www.iesfranciscodelosrios.es/wp-content/uploads/2023/01/logo-menu-ies-rios-2-480x51.webp" alt="Logo IES Francisco de los Rios"/>
+      Horario Bachiller 2D Ciencias Sociales
+    </h1>
+
+    <div class="status-wrapper">
+      <div id="liveStatus" class="live-status">Cargando estado actual...</div>
+    </div>
+
+    <div class="table-container">
+      <table class="schedule-table">
+        <tr>
+          <th>Horas</th>
+          <th>Lunes</th>
+          <th>Martes</th>
+          <th>Miércoles</th>
+          <th>Jueves</th>
+          <th>Viernes</th>
+        </tr>
+        <tr>
+          <td>08:30 - 09:30</td>
+          <td>Filosofía</td>
+          <td>Historia de España</td>
+          <td>Historia de España</td>
+          <td>Economía</td>
+          <td>Historia del Arte</td>
+        </tr>
+        <tr>
+          <td>09:30 - 10:30</td>
+          <td>Historia de España</td>
+          <td>Finanzas</td>
+          <td>Religión</td>
+          <td>Matemáticas</td>
+          <td>Historia de España</td>
+        </tr>
+        <tr>
+          <td>10:30 - 11:30</td>
+          <td>Lengua</td>
+          <td>Filosofía</td>
+          <td>Inglés</td>
+          <td>Historia del Arte</td>
+          <td>Filosofía</td>
+        </tr>
+        <tr>
+          <th colspan="6" class="recreo">RECREO</th>
+        </tr>
+        <tr>
+          <td>12:00 - 13:00</td>
+          <td>Matemáticas</td>
+          <td>Historia del Arte</td>
+          <td>Lengua</td>
+          <td>E.F.</td>
+          <td>Matemáticas</td>
+        </tr>
+        <tr>
+          <td>13:00 - 14:00</td>
+          <td>Historia del Arte</td>
+          <td>E.F.</td>
+          <td>Matemáticas</td>
+          <td>Finanzas</td>
+          <td>Economía</td>
+        </tr>
+        <tr>
+          <td>14:00 - 15:00</td>
+          <td>Inglés</td>
+          <td>Economía</td>
+          <td>Economía</td>
+          <td>Inglés</td>
+          <td>Lengua</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- LEYENDA COMENTADA PARA FUTURO USO
+    <div class="leyenda">
+      <p><strong>IPE</strong> → Itinerario personal para la Empleabilidad (Profesor: A. Ruiz)</p>
+      <p><strong>DIW</strong> → Diseño de Interfaces Web (Profesor: Javier)</p>
+      <p><strong>DWEC</strong> → Desarrollo Web en Entorno Cliente (Profesor: Alfonso)</p>
+      <p><strong>DWES</strong> → Desarrollo Web en Entorno Servidor (Profesor: A. Marín)</p>
+      <p><strong>Ciber</strong> → Ciberseguridad (Profesor: Miguel)</p>
+      <p><strong>DAW</strong> → Desarrollo de Aplicaciones Web (Profesor: Antonio Sillero)</p>
+      <p><strong>Proy.I.</strong> → Proyecto Integrado (Profesor: Sillero)</p>
+      <p><strong>ING</strong> → Inglés (Profesora: Ana)</p>
+    </div>
+    -->
+
+    <div class="copyright-footer">
+      &copy; <span id="currentYearCopy">2026/2027</span>
+    </div>
+  </div>
+
+  <div class="action-buttons">
+    <button id="toggleColorBtn" class="btn btn-color-palette">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 2.2c-5.5 0-10 4.5-10 10s4.5 10 10 10c1.7 0 3-1.3 3-3 0-.8-.3-1.5-.8-2-.3-.3-.4-.7-.4-1.1 0-1.1.9-2 2-2h1.2c3.3 0 6-2.7 6-6 0-3.3-4.9-6-11-6z"></path>
+        <circle cx="7.5" cy="10.5" r=".5" fill="currentColor"></circle>
+        <circle cx="10.5" cy="6.5" r=".5" fill="currentColor"></circle>
+        <circle cx="14.5" cy="6.5" r=".5" fill="currentColor"></circle>
+        <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"></circle>
+      </svg>
+      <span>Modo Pastel</span>
+    </button>
+    <button id="installButton" class="btn">
+      <svg viewBox="0 0 24 24">
+        <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-3 3m0 0l-3-3m3 3V4"/>
+      </svg>
+      Añadir al escritorio
+    </button>
+    <button id="downloadPdfButton" class="btn">
+      <svg viewBox="0 0 24 24">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="12" y1="18" x2="12" y2="12"></line>
+        <line x1="9" y1="15" x2="12" y2="18"></line>
+        <line x1="15" y1="15" x2="12" y2="18"></line>
+      </svg>
+      Descargar Horario
+    </button>
+    <button id="downloadQuadrantBtn" class="btn btn-calendar">
+      <svg viewBox="0 0 24 24">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+      </svg>
+      Cuadrante del Mes
+    </button>
+  </div>
+
+  <div class="quadrant-hidden-wrapper">
+    <div id="quadrantToPdf" class="aesthetic-quadrant">
+      <div style="display: flex; justify-content: space-between; align-items: flex-end; padding: 40px 40px 20px 40px;">
+        <div>
+          <h1 id="quadrantMonthName" style="font-size: 52px; margin: 0; text-transform: capitalize; color: #1abc9c; font-weight: 600; line-height: 1; letter-spacing: -1px;">Mes</h1>
+          <p style="font-size: 20px; margin: 8px 0 0 0; color: #7f8c8d; font-weight: 400;">Bachiller 2D Ciencias Sociales - <span id="quadrantYearLabel">Año</span></p>
+        </div>
+        <img src="https://www.iesfranciscodelosrios.es/wp-content/uploads/2023/01/logo-menu-ies-rios-2-480x51.webp" alt="Logo" style="height: 55px; filter: brightness(0); opacity: 0.8;"/>
+      </div>
+      
+      <table id="quadrantTable" style="width: 100%; flex-grow: 1; border-collapse: collapse; table-layout: fixed;">
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Configurar Hover
+    document.querySelectorAll(".schedule-table td").forEach((item) => {
+      item.addEventListener("mouseover", (event) => {
+        const subject = event.target.textContent;
+        document.querySelectorAll(".schedule-table td").forEach((cell) => {
+          if (cell.textContent === subject && subject !== "") cell.classList.add("highlight");
+        });
+      });
+      item.addEventListener("mouseout", (event) => {
+        const subject = event.target.textContent;
+        document.querySelectorAll(".schedule-table td").forEach((cell) => {
+          if (cell.textContent === subject) cell.classList.remove("highlight");
+        });
+      });
+    });
+
+    // Añadir atributos de color
+    document.querySelectorAll(".schedule-table tr").forEach(row => {
+      Array.from(row.cells).forEach((cell, index) => {
+        if (index > 0 && cell.tagName === 'TD' && cell.textContent.trim() !== '') {
+          cell.setAttribute("data-subject", cell.textContent.trim());
+        }
+      });
+    });
+
+    // Memoria Modo Color
+    const colorBtn = document.getElementById('toggleColorBtn');
+    const colorBtnText = colorBtn.querySelector('span');
+    const savedTheme = localStorage.getItem('scheduleTheme');
+
+    if (savedTheme === 'color') {
+      document.body.classList.add('color-mode');
+      colorBtnText.textContent = 'Modo Normal';
+    }
+
+    colorBtn.addEventListener('click', () => {
+      document.body.classList.toggle('color-mode');
+      if (document.body.classList.contains('color-mode')) {
+        localStorage.setItem('scheduleTheme', 'color');
+        colorBtnText.textContent = 'Modo Normal';
+      } else {
+        localStorage.setItem('scheduleTheme', 'normal');
+        colorBtnText.textContent = 'Modo Pastel';
+      }
+    });
+
+    const timeTable = [
+      { start: "08:30", end: "09:30", rowIndex: 1 },
+      { start: "09:30", end: "10:30", rowIndex: 2 },
+      { start: "10:30", end: "11:30", rowIndex: 3 },
+      { start: "11:30", end: "12:00", rowIndex: 4, isBreak: true },
+      { start: "12:00", end: "13:00", rowIndex: 5 },
+      { start: "13:00", end: "14:00", rowIndex: 6 },
+      { start: "14:00", end: "15:00", rowIndex: 7 }
+    ];
+
+    function updateLiveStatus() {
+      const currentDate = new Date();
+      const currentDay = currentDate.getDay(); 
+      const totalCurrentMinutes = currentDate.getHours() * 60 + currentDate.getMinutes();
+      const statusBox = document.getElementById('liveStatus');
+      
+      document.querySelectorAll('.current-class').forEach(el => el.classList.remove('current-class'));
+
+      if (currentDay === 0 || currentDay === 6) {
+        statusBox.textContent = "Fin de semana 🎉 ¡A descansar!";
+        return;
+      }
+
+      let activeSlot = null;
+      for (let i = 0; i < timeTable.length; i++) {
+        const slot = timeTable[i];
+        const startMins = parseInt(slot.start.split(':')[0]) * 60 + parseInt(slot.start.split(':')[1]);
+        const endMins = parseInt(slot.end.split(':')[0]) * 60 + parseInt(slot.end.split(':')[1]);
+
+        if (totalCurrentMinutes >= startMins && totalCurrentMinutes < endMins) {
+          activeSlot = slot;
+          activeSlot.endMins = endMins;
+          break;
+        }
+      }
+
+      if (activeSlot) {
+        const minsLeft = activeSlot.endMins - totalCurrentMinutes;
+        if (activeSlot.isBreak) {
+          statusBox.textContent = `☕ ¡Recreo! Termina en ${minsLeft} min.`;
+          const breakCell = document.querySelector('.schedule-table tr:nth-child(5) th');
+          if (breakCell) breakCell.classList.add('current-class');
+        } else {
+          const scheduleTable = document.querySelector('.schedule-table');
+          const activeCell = scheduleTable.rows[activeSlot.rowIndex].cells[currentDay];
+          statusBox.textContent = `📚 Clase actual: ${activeCell.textContent} (Termina en ${minsLeft} min)`;
+          activeCell.classList.add('current-class');
+        }
+      } else if (totalCurrentMinutes < 510) { 
+        statusBox.textContent = "Las clases de hoy aún no han empezado 😴";
+      } else if (totalCurrentMinutes >= 900) { 
+        statusBox.textContent = "¡Clases terminadas por hoy! 🏠";
+      }
+    }
+    updateLiveStatus();
+    setInterval(updateLiveStatus, 60000);
+
+    // Descarga Horario PDF
+    document.getElementById('downloadPdfButton').addEventListener('click', () => {
+      const elementToCapture = document.getElementById('contentToPdf');
+      elementToCapture.classList.add('pdf-mode');
+
+      html2pdf().set({
+        margin: 10,
+        filename: 'Horario_Bachiller_2D_CS.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, backgroundColor: '#ffffff' },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      }).from(elementToCapture).save().then(() => {
+        elementToCapture.classList.remove('pdf-mode');
+      });
+    });
+
+    // Construir y Descargar Cuadrante PDF Moderno
+    document.getElementById('downloadQuadrantBtn').addEventListener('click', () => {
+      const date = new Date();
+      const currentYear = date.getFullYear();
+      const currentMonthIndex = date.getMonth();
+      const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      
+      document.getElementById('quadrantMonthName').textContent = monthNames[currentMonthIndex];
+      document.getElementById('quadrantYearLabel').textContent = currentYear;
+
+      const quadrantTable = document.getElementById('quadrantTable');
+      quadrantTable.innerHTML = `
+        <tr style="height: 50px;">
+          <th style="border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; color: #94a3b8; font-weight: 600; font-size: 13px; letter-spacing: 1px;">LUNES</th>
+          <th style="border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; color: #94a3b8; font-weight: 600; font-size: 13px; letter-spacing: 1px;">MARTES</th>
+          <th style="border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; color: #94a3b8; font-weight: 600; font-size: 13px; letter-spacing: 1px;">MIÉRCOLES</th>
+          <th style="border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; color: #94a3b8; font-weight: 600; font-size: 13px; letter-spacing: 1px;">JUEVES</th>
+          <th style="border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; color: #94a3b8; font-weight: 600; font-size: 13px; letter-spacing: 1px;">VIERNES</th>
+          <th style="border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; color: #94a3b8; font-weight: 600; font-size: 13px; letter-spacing: 1px; background-color: #f8fafc;">SÁBADO</th>
+          <th style="border-bottom: 1px solid #e2e8f0; color: #94a3b8; font-weight: 600; font-size: 13px; letter-spacing: 1px; background-color: #f8fafc;">DOMINGO</th>
+        </tr>
+      `;
+
+      const firstDay = new Date(currentYear, currentMonthIndex, 1).getDay();
+      let startingDay = firstDay - 1;
+      if (startingDay === -1) startingDay = 6; 
+      
+      const daysInMonth = new Date(currentYear, currentMonthIndex + 1, 0).getDate();
+      let currentDay = 1;
+
+      for (let i = 0; i < 6; i++) {
+        let row = document.createElement('tr');
+        for (let j = 0; j < 7; j++) {
+          let cell = document.createElement('td');
+          
+          cell.style.borderBottom = "1px solid #e2e8f0";
+          cell.style.borderRight = "1px solid #e2e8f0";
+          
+          if (j === 6) cell.style.borderRight = "none"; 
+          if (i === 5) cell.style.borderBottom = "none"; 
+          
+          cell.style.verticalAlign = "top";
+          cell.style.padding = "15px 15px"; 
+          
+          if (j >= 5) cell.style.backgroundColor = "#f8fafc"; 
+
+          if (i === 0 && j < startingDay) {
+            cell.innerHTML = "";
+          } else if (currentDay > daysInMonth) {
+            cell.innerHTML = "";
+          } else {
+            cell.innerHTML = `<span style="font-weight: 500; color: #1abc9c; font-size: 20px; display: block; text-align: right;">${currentDay}</span>`;
+            currentDay++;
+          }
+          row.appendChild(cell);
+        }
+        quadrantTable.appendChild(row);
+        if (currentDay > daysInMonth) break;
+      }
+
+      const elementToCapture = document.getElementById('quadrantToPdf');
+      html2pdf().set({
+        margin: 0,
+        filename: `Cuadrante_${monthNames[currentMonthIndex]}_${currentYear}.pdf`,
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { scale: 2, backgroundColor: '#ffffff' },
+        jsPDF: { unit: 'px', format: [1123, 794], orientation: 'landscape' }
+      }).from(elementToCapture).save();
+    });
+
+    // PWA: Instalar
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (event) => {
+      event.preventDefault();
+      deferredPrompt = event;
+    });
+
+    document.getElementById('installButton').addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+      } else {
+        alert("Para instalar en iPhone:\n1. Toca 'Compartir'.\n2. Selecciona 'Añadir a la pantalla de inicio'.");
+      }
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
+    }
+  </script>
+</body>
+</html>
